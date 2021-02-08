@@ -52,8 +52,8 @@ public class ViewController implements Initializable {
     private ComboBox<String> comboBox;
     private BorderPane borderPane = new BorderPane();
     private ComboBox<String> personComboBox;
-    private ContextMenu contextMenuPerson = new ContextMenu();
-    private ContextMenu contextMenuStats = new ContextMenu();
+    private final ContextMenu contextMenuPerson = new ContextMenu();
+    private final ContextMenu contextMenuStats = new ContextMenu();
     private static final PieChartUtils PIE_CHART_UTILS = new PieChartUtils();
     private static final BarChartUtils BAR_CHART_UTILS = new BarChartUtils();
     private static final List<String> days = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
