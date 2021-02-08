@@ -94,7 +94,8 @@ public class ViewController implements Initializable {
     }
 
     private void initContextMenuPerson() {
-        List<MenuItem> menuItems = Arrays.asList(new MenuItem("Attend"), new SeparatorMenuItem(), new MenuItem("New Person"), new MenuItem("Edit Person"), new MenuItem("Delete Person")
+        List<MenuItem> menuItems = Arrays.asList(new MenuItem("Attend")
+                , new SeparatorMenuItem(), new MenuItem("New Person"), new MenuItem("Edit Person"), new MenuItem("Delete Person")
                 , new SeparatorMenuItem(), new MenuItem("Show graph"), new MenuItem("Show pie"));
         menuItems.get(0).setOnAction(v -> attendSchool());
         menuItems.get(2).setOnAction(v -> newPerson());
@@ -220,6 +221,7 @@ public class ViewController implements Initializable {
                             personList.forEach(person -> {
                                 if (person.getName() == p.getAccessibleText()) {
                                     this.selectedPerson = person;
+                                    main.getPrimaryStage().setTitle("Hello " + person.getName());
                                     check.set(true);
                                 }
                             });
@@ -231,8 +233,10 @@ public class ViewController implements Initializable {
                         }
                     }
             );
-            if (!check.get())
+            if (!check.get()){
                 selectedPerson = null;
+                main.getPrimaryStage().setTitle("Hello World");
+            }
         });
     }
 
@@ -305,4 +309,5 @@ public class ViewController implements Initializable {
     private void closeWindow() {
         main.getPrimaryStage().close();
     }
+
 }

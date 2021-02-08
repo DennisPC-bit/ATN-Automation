@@ -17,7 +17,7 @@ import java.util.List;
  */
 
 public class Person {
-    private static DoubleProperty IMAGE_SIZE = new SimpleDoubleProperty(100);
+    private static DoubleProperty IMAGE_SIZE = new SimpleDoubleProperty(140);
     private Image image = new Image("GUI/IMG/noIMG.png");
     private IntegerProperty id;
     private StringProperty name;
