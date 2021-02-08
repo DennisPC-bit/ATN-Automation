@@ -4,7 +4,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * Author DennisPC-bit
@@ -23,7 +25,7 @@ public class Main extends Application {
         this.viewController = loader.getController();
         viewController.setMain(this);
         primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root,400,400));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

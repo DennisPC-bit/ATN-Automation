@@ -1,14 +1,9 @@
 package GUI;
 
-import BE.BarChartUtils;
-import BE.MenuItemBit;
-import BE.Person;
-import BE.PieChartUtils;
+import BE.*;
 import BLL.PersonManager;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
+import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -20,9 +15,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 
-import javax.swing.*;
-import java.beans.EventHandler;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +31,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ViewController implements Initializable {
     public TextField field;
+    @FXML
+    private MenuBar menuBar;
     @FXML
     private Button attendBtn;
     @FXML
@@ -60,16 +56,19 @@ public class ViewController implements Initializable {
     private static final PieChartUtils PIE_CHART_UTILS = new PieChartUtils();
     private static final BarChartUtils BAR_CHART_UTILS = new BarChartUtils();
     private static final List<String> days = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
+    EditPane editPane;
+    Button confirmButton = new Button("Confirm");
+    Button cancelButton = new Button("Cancel");
+    StringProperty confirmationType = new SimpleStringProperty("");
+    private static final String NEW_CONFIRMATION = "new";
+    private static final String EDIT_CONFIRMATION = "edit";
+    private static final String DELETE_CONFIRMATION = "del";
 
     public void setMain(Main main) {
         this.main = main;
     }
 
     public ViewController() {
-    }
-
-    public void doThing() {
-        Person.setImageSize(main.getPrimaryStage().getScene().getHeight() / personList.size() + main.getPrimaryStage().getScene().getWidth() / personList.size());
     }
 
     @Override
@@ -81,6 +80,48 @@ public class ViewController implements Initializable {
         personSwitch();
         initContextMenuPerson();
         initContextMenuStats();
+        confirmationFunctionality();
+    }
+
+    private void confirmationFunctionality() {
+        confirmationType.addListener(a -> {
+            switch (confirmationType.get()) {
+                case (NEW_CONFIRMATION):
+                    confirmButton.setOnAction(v -> {
+                        if (!editPane.getTextFields().isEmpty() && !editPane.getTextFields().get(1).getText().isBlank()) {
+                            newPerson(editPane.getTextFields().get(1).getText());
+                            showAttendance();
+                        } else
+                            editPane.get().setTop(new Label("Come on a man's gotta have a name"));
+                    });
+                    cancelButton.setOnAction(v -> showAttendance());
+                    break;
+                case (EDIT_CONFIRMATION):
+                    confirmButton.setOnAction(d -> {
+                        if (!editPane.getTextFields().isEmpty() && !editPane.getTextFields().get(0).getText().isBlank()) {
+                            selectedPerson.setName(editPane.getTextFields().get(0).getText());
+                            showAttendance();
+                        } else
+                            editPane.get().setTop(new Label("Come on a man's gotta have a name"));
+                    });
+                    cancelButton.setOnAction(e -> showAttendance());
+                    break;
+                case (DELETE_CONFIRMATION):
+                    confirmButton.setOnAction(d -> {
+                                flowPane.getChildren().remove(selectedPerson.getPersonPane());
+                                personList.remove(selectedPerson);
+                                selectedPerson = null;
+                                centerPane.setTop(menuBar);
+                            }
+                    );
+                    cancelButton.setOnAction(d -> {
+                        centerPane.setTop(menuBar);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     private void initContextMenuStats() {
@@ -97,7 +138,7 @@ public class ViewController implements Initializable {
 
     private void initContextMenuPerson() {
         List<MenuItem> menuItems = Arrays.asList(
-                  new MenuItemBit("Attend", v -> attendSchool()).getMenuItem()
+                new MenuItemBit("Attend", v -> attendSchool()).getMenuItem()
                 , new SeparatorMenuItem()
                 , new MenuItemBit("New Person", v -> newPerson()).getMenuItem()
                 , new MenuItemBit("Edit Person", v -> editPerson()).getMenuItem()
@@ -105,10 +146,12 @@ public class ViewController implements Initializable {
                 , new SeparatorMenuItem()
                 , new MenuItemBit("Show graph", v -> {
                     showStats();
-                    centerPane.setCenter(BAR_CHART_UTILS.getTotalAttendanceBarChart(selectedPerson));}).getMenuItem()
+                    centerPane.setCenter(BAR_CHART_UTILS.getTotalAttendanceBarChart(selectedPerson));
+                }).getMenuItem()
                 , new MenuItemBit("Show pie", v -> {
                     showStats();
-                    centerPane.setCenter(PIE_CHART_UTILS.getPersonPieChart(selectedPerson));}).getMenuItem());
+                    centerPane.setCenter(PIE_CHART_UTILS.getPersonPieChart(selectedPerson));
+                }).getMenuItem());
         menuItems.forEach(e -> contextMenuPerson.getItems().add(e));
     }
 
@@ -242,20 +285,23 @@ public class ViewController implements Initializable {
 
     @FXML
     private void newPerson() {
-        String s = "";
-        while (s.isBlank() || s.isEmpty()) {
-            s = (String) JOptionPane.showInputDialog(null, "Enter the name", "New Person", JOptionPane.PLAIN_MESSAGE);
-            if (s == null)
-                break;
-            personList.sort(Comparator.comparingInt(Person::getId));
-            Person p = new Person(personList.get(0).getId() + 1, s);
-            personList.add(p);
-            flowPane.getChildren().add(p.getPersonPane());
-        }
+        List<Label> labels = Arrays.asList(new Label("Id"), new Label("Name"));
+        List<TextField> textFields = Arrays.asList(new TextField(), new TextField());
+        this.editPane = new EditPane(confirmButton, cancelButton, labels, textFields);
+        confirmationType.set(NEW_CONFIRMATION);
+        centerPane.setCenter(editPane.get());
+    }
+
+    private void newPerson(String name) {
+        personList.sort(Comparator.comparingInt(Person::getId));
+        Person p = new Person(personList.get(0).getId() + 1, name);
+        personList.add(p);
+        flowPane.getChildren().add(p.getPersonPane());
     }
 
     @FXML
     private void editPerson() {
+        /*
         String s = "";
         while (s.isBlank() || s.isEmpty()) {
             s = (String) JOptionPane.showInputDialog(null, "Enter the name", "Edit Person: " + selectedPerson.getName(), JOptionPane.PLAIN_MESSAGE);
@@ -264,10 +310,22 @@ public class ViewController implements Initializable {
             personList.sort(Comparator.comparingInt(Person::getId));
             selectedPerson.setName(s);
         }
+
+         */
+        if(selectedPerson!=null){
+
+        List<Label> labels = Arrays.asList(new Label("Name"));
+        List<TextField> textFields = Arrays.asList(new TextField(selectedPerson.getName()));
+        this.editPane = new EditPane(confirmButton, cancelButton, labels, textFields);
+        confirmationType.set(EDIT_CONFIRMATION);
+        centerPane.setCenter(editPane.get());
+        }
     }
 
     @FXML
     private void deletePerson() {
+
+        /*
         if (selectedPerson != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setContentText("Confirm deletion");
@@ -277,6 +335,18 @@ public class ViewController implements Initializable {
                 personList.remove(selectedPerson);
                 selectedPerson = null;
             }
+        }
+
+         */
+        if (selectedPerson != null) {
+            confirmationType.set(DELETE_CONFIRMATION);
+            BorderPane instanceBorderPane = new BorderPane();
+            instanceBorderPane.setLeft(new Label("Confirm deletion of " + selectedPerson.getName()));
+            GridPane instanceGridPane = new GridPane();
+            instanceGridPane.add(confirmButton, 0, 0);
+            instanceGridPane.add(cancelButton, 1, 0);
+            instanceBorderPane.setRight(instanceGridPane);
+            centerPane.setTop(instanceBorderPane);
         }
     }
 

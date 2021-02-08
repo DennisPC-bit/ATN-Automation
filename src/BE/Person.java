@@ -56,6 +56,7 @@ public class Person {
     public void setName(String name) {
         this.name.set(name);
         nameLabel.setText(name);
+        personPane.setAccessibleText(name);
     }
 
     public BorderPane getPersonPane() {
