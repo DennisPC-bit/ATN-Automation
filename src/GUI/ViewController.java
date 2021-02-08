@@ -1,12 +1,14 @@
 package GUI;
 
 import BE.BarChartUtils;
+import BE.MenuItemBit;
 import BE.Person;
 import BE.PieChartUtils;
 import BLL.PersonManager;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -18,7 +20,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+
 import javax.swing.*;
+import java.beans.EventHandler;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Author DennisPC-bit
- *
  */
 
 public class ViewController implements Initializable {
@@ -62,11 +65,11 @@ public class ViewController implements Initializable {
         this.main = main;
     }
 
-    public ViewController(){
+    public ViewController() {
     }
 
     public void doThing() {
-        Person.setImageSize(main.getPrimaryStage().getScene().getHeight()/personList.size()+main.getPrimaryStage().getScene().getWidth()/personList.size());
+        Person.setImageSize(main.getPrimaryStage().getScene().getHeight() / personList.size() + main.getPrimaryStage().getScene().getWidth() / personList.size());
     }
 
     @Override
@@ -81,8 +84,7 @@ public class ViewController implements Initializable {
     }
 
     private void initContextMenuStats() {
-        List<MenuItem> menuItems = Arrays.asList(new MenuItem("go Back"));
-        menuItems.get(0).setOnAction(v -> showAttendance());
+        List<MenuItem> menuItems = Arrays.asList(new MenuItemBit("go Back", v -> showAttendance()).getMenuItem());
         menuItems.forEach(e -> contextMenuStats.getItems().add(e));
 
         borderPane.setOnMouseClicked(e -> {
@@ -94,21 +96,19 @@ public class ViewController implements Initializable {
     }
 
     private void initContextMenuPerson() {
-        List<MenuItem> menuItems = Arrays.asList(new MenuItem("Attend")
-                , new SeparatorMenuItem(), new MenuItem("New Person"), new MenuItem("Edit Person"), new MenuItem("Delete Person")
-                , new SeparatorMenuItem(), new MenuItem("Show graph"), new MenuItem("Show pie"));
-        menuItems.get(0).setOnAction(v -> attendSchool());
-        menuItems.get(2).setOnAction(v -> newPerson());
-        menuItems.get(3).setOnAction(v -> editPerson());
-        menuItems.get(5).setOnAction(v -> deletePerson());
-        menuItems.get(6).setOnAction(v -> {
-            showStats();
-            centerPane.setCenter(BAR_CHART_UTILS.getTotalAttendanceBarChart(selectedPerson));
-        });
-        menuItems.get(7).setOnAction(v -> {
-            showStats();
-            centerPane.setCenter(PIE_CHART_UTILS.getPersonPieChart(selectedPerson));
-        });
+        List<MenuItem> menuItems = Arrays.asList(
+                  new MenuItemBit("Attend", v -> attendSchool()).getMenuItem()
+                , new SeparatorMenuItem()
+                , new MenuItemBit("New Person", v -> newPerson()).getMenuItem()
+                , new MenuItemBit("Edit Person", v -> editPerson()).getMenuItem()
+                , new MenuItemBit("Delete Person", v -> deletePerson()).getMenuItem()
+                , new SeparatorMenuItem()
+                , new MenuItemBit("Show graph", v -> {
+                    showStats();
+                    centerPane.setCenter(BAR_CHART_UTILS.getTotalAttendanceBarChart(selectedPerson));}).getMenuItem()
+                , new MenuItemBit("Show pie", v -> {
+                    showStats();
+                    centerPane.setCenter(PIE_CHART_UTILS.getPersonPieChart(selectedPerson));}).getMenuItem());
         menuItems.forEach(e -> contextMenuPerson.getItems().add(e));
     }
 
@@ -233,7 +233,7 @@ public class ViewController implements Initializable {
                         }
                     }
             );
-            if (!check.get()){
+            if (!check.get()) {
                 selectedPerson = null;
                 main.getPrimaryStage().setTitle("Hello World");
             }
