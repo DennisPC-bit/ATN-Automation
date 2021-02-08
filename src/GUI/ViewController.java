@@ -78,9 +78,6 @@ public class ViewController implements Initializable {
         personSwitch();
         initContextMenuPerson();
         initContextMenuStats();
-        Button b = new Button();
-        b.onActionProperty().addListener(v->doThing());
-        centerPane.setTop(b);
     }
 
     private void initContextMenuStats() {
