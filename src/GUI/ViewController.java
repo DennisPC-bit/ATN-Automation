@@ -16,7 +16,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -63,6 +62,7 @@ public class ViewController implements Initializable {
     private static final String NEW_CONFIRMATION = "new";
     private static final String EDIT_CONFIRMATION = "edit";
     private static final String DELETE_CONFIRMATION = "del";
+    Thread thread = new Thread();
 
     public void setMain(Main main) {
         this.main = main;
@@ -336,7 +336,6 @@ public class ViewController implements Initializable {
                 selectedPerson = null;
             }
         }
-
          */
         if (selectedPerson != null) {
             confirmationType.set(DELETE_CONFIRMATION);
@@ -365,7 +364,8 @@ public class ViewController implements Initializable {
                     dateLabel.setText(t1.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
                     if (main.getPrimaryStage().isShowing()) {
                         try {
-                            Thread.sleep(1);
+                            thread.setPriority(4);
+                            thread.sleep(1);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
