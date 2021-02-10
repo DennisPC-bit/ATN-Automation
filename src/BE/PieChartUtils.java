@@ -3,6 +3,7 @@ package BE;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +11,6 @@ import java.util.List;
 
 /**
  * Author DennisPC-bit
- *
  */
 
 public class PieChartUtils {
@@ -51,9 +51,10 @@ public class PieChartUtils {
                     dayFreq[d.getDayOfWeek().getValue() - 1] += 1;
             });
         });
-        for (int i = 0; i < 5; i++){
-            if(dayFreq[i]>0)
-                pieChartData.add(new PieChart.Data(days.get(i), dayFreq[i]));}
+        for (int i = 0; i < 5; i++) {
+            if (dayFreq[i] > 0)
+                pieChartData.add(new PieChart.Data(days.get(i), dayFreq[i]));
+        }
         PieChart pieChart = new PieChart(pieChartData);
         pieChart.setTitle("Fraction of total attendance");
         return pieChart;

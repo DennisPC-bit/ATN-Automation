@@ -54,7 +54,6 @@ public class ViewController implements Initializable {
     private final ContextMenu contextMenuStats = new ContextMenu();
     private static final PieChartUtils PIE_CHART_UTILS = new PieChartUtils();
     private static final BarChartUtils BAR_CHART_UTILS = new BarChartUtils();
-    private static final List<String> days = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday");
     EditPane editPane;
     Button confirmButton = new Button("Confirm");
     Button cancelButton = new Button("Cancel");
@@ -359,12 +358,12 @@ public class ViewController implements Initializable {
     }
 
     private void autoUpdateTime() {
+        thread.setPriority(4);
         updateTime();
         dateTimeObjectProperty.addListener((observableValue, localDateTime, t1) -> {
                     dateLabel.setText(t1.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)));
                     if (main.getPrimaryStage().isShowing()) {
                         try {
-                            thread.setPriority(4);
                             thread.sleep(1);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
